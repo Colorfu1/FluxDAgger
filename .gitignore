@@ -1,0 +1,98 @@
+# ================================================================
+# DAgger-specific: catkin / ROS build artifacts
+# ================================================================
+build/
+devel/
+logs/
+.catkin_tools/
+log/
+install/
+
+# Developer scratch (entire directory excluded from the repo)
+dev/
+
+# Workspace data / checkpoints
+visualize_result/
+data_test/
+ckpt/
+optimization_docs
+
+# Example data workspace: keep docs/placeholders, ignore generated payloads.
+data_example/
+!data_example/README.md
+
+# ================================================================
+# Common (aligned with FluxVLA .gitignore)
+# ================================================================
+
+# Ignore image files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.svg
+*.webp
+!assets/
+!assets/*.svg
+!assets/*.png
+!assets/*.jpg
+!assets/*.jpeg
+
+# Ignore video files
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+
+# Ignore checkpoint files
+*.ckpt
+*.pth
+*.h5
+*.model
+*.weights
+
+# Ignore other common binary files
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Ignore temporary files
+*.tmp
+*.log
+*.bak
+*.swp
+*.DS_Store
+*.pyc
+Thumbs.db
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Editor / IDE
+.vscode/
+.idea/
+.cursor
+.cursorignore
+.cursorindexingignore
+*.swo
+
+# ROS bags
+*.bag
+
+# Build and output directories
+dist/
+out/
+*.egg-info/
+
+# Node / dependency dirs
+node_modules/
+vendor/

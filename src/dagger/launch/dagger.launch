@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<!-- Starts the full DAgger collection system without online reward inference.
+
+     Defaults come from config/default.yaml. Pass any arg below to override the
+     matching node-private ROS param for this launch only.
+-->
+<launch>
+    <arg name="config_file" default="$(find dagger)/config/default.yaml"/>
+    <arg name="config_default" default="__config__"/>
+
+    <arg name="collect_frame_data" default="true"/>
+
+    <arg name="debug" default="$(arg config_default)"/>
+    <arg name="master_publish_rate" default="$(arg config_default)"/>
+    <arg name="puppet_publish_rate" default="$(arg config_default)"/>
+    <arg name="sync_observation_rate" default="$(arg config_default)"/>
+    <arg name="data_collection_rate" default="$(arg config_default)"/>
+    <arg name="sync_slop" default="$(arg config_default)"/>
+    <arg name="synced_observation_pub_queue_size" default="$(arg config_default)"/>
+    <arg name="synced_observation_queue_size" default="$(arg config_default)"/>
+    <arg name="synced_observation_drain_timeout" default="$(arg config_default)"/>
+
+    <arg name="ckpt_dir" default="$(arg config_default)"/>
+    <arg name="task_id" default="$(arg config_default)"/>
+    <arg name="scene_dir" default="$(arg config_default)"/>
+    <arg name="save_data_base_dir" default="$(arg config_default)"/>
+    <arg name="sync_fail_log_dir" default="$(arg config_default)"/>
+    <arg name="task_text" default="$(arg config_default)"/>
+
+    <arg name="img_head_topic" default="$(arg config_default)"/>
+    <arg name="img_front_topic" default="$(arg config_default)"/>
+    <arg name="img_left_topic" default="$(arg config_default)"/>
+    <arg name="img_right_topic" default="$(arg config_default)"/>
+    <arg name="camera_names" default="$(arg config_default)"/>
+
+    <arg name="puppet_arm_left_topic" default="$(arg config_default)"/>
+    <arg name="puppet_arm_right_topic" default="$(arg config_default)"/>
+    <arg name="puppet_arm_left_cmd_topic" default="$(arg config_default)"/>
+    <arg name="puppet_arm_right_cmd_topic" default="$(arg config_default)"/>
+    <arg name="puppet_arm_left_raw_action_topic" default="$(arg config_default)"/>
+    <arg name="puppet_arm_right_raw_action_topic" default="$(arg config_default)"/>
+    <arg name="puppet_ee_pose_left_topic" default="$(arg config_default)"/>
+    <arg name="puppet_ee_pose_right_topic" default="$(arg config_default)"/>
+
+    <arg name="front_left_can_port" default="$(arg config_default)"/>
+    <arg name="front_right_can_port" default="$(arg config_default)"/>
+    <arg name="rear_left_can_port" default="$(arg config_default)"/>
+    <arg name="rear_right_can_port" default="$(arg config_default)"/>
+
+    <node name="dagger_controller" pkg="dagger" type="dagger_controller_node.py" output="screen" required="true">
+        <param name="config_file" value="$(arg config_file)"/>
+    </node>
+
+    <node name="arm_front_left" pkg="dagger" type="arm_node.py" output="screen">
+        <param name="config_file" value="$(arg config_file)"/>
+        <param name="arm_name" value="front_left"/>
+        <param name="can_port" value="$(arg front_left_can_port)"/>
+        <param name="puppet_publish_rate" value="$(arg puppet_publish_rate)"/>
+    </node>
+    <node name="arm_front_right" pkg="dagger" type="arm_node.py" output="screen">
+        <param name="config_file" value="$(arg config_file)"/>
+        <param name="arm_name" value="front_right"/>
+        <param name="can_port" value="$(arg front_right_can_port)"/>
+        <param name="puppet_publish_rate" value="$(arg puppet_publish_rate)"/>
+    </node>
+    <node name="arm_rear_left" pkg="dagger" type="arm_node.py" output="screen">
+        <param name="config_file" value="$(arg config_file)"/>
+        <param name="arm_name" value="rear_left"/>
+        <param name="can_port" value="$(arg rear_left_can_port)"/>
+        <param name="master_publish_rate" value="$(arg master_publish_rate)"/>
+    </node>
+    <node name="arm_rear_right" pkg="dagger" type="arm_node.py" output="screen">
+        <param name="config_file" value="$(arg config_file)"/>
+        <param name="arm_name" value="rear_right"/>
+        <param name="can_port" value="$(arg rear_right_can_port)"/>
+        <param name="master_publish_rate" value="$(arg master_publish_rate)"/>
+    </node>
+
+    <node name="sync_observation_node" pkg="dagger" type="sync_observation_node.py" output="screen">
+        <param name="config_file" value="$(arg config_file)"/>
+        <param name="debug" value="$(arg debug)"/>
+        <param name="sync_observation_rate" value="$(arg sync_observation_rate)"/>
+        <param name="synced_observation_pub_queue_size" value="$(arg synced_observation_pub_queue_size)"/>
+        <param name="img_head_topic" value="$(arg img_head_topic)"/>
+        <param name="img_front_topic" value="$(arg img_front_topic)"/>
+        <param name="img_left_topic" value="$(arg img_left_topic)"/>
+        <param name="img_right_topic" value="$(arg img_right_topic)"/>
+        <param name="puppet_arm_left_topic" value="$(arg puppet_arm_left_topic)"/>
+        <param name="puppet_arm_right_topic" value="$(arg puppet_arm_right_topic)"/>
+        <param name="puppet_arm_left_cmd_topic" value="$(arg puppet_arm_left_cmd_topic)"/>
+        <param name="puppet_arm_right_cmd_topic" value="$(arg puppet_arm_right_cmd_topic)"/>
+        <param name="puppet_arm_left_raw_action_topic" value="$(arg puppet_arm_left_raw_action_topic)"/>
+        <param name="puppet_arm_right_raw_action_topic" value="$(arg puppet_arm_right_raw_action_topic)"/>
+        <param name="puppet_ee_pose_left_topic" value="$(arg puppet_ee_pose_left_topic)"/>
+        <param name="puppet_ee_pose_right_topic" value="$(arg puppet_ee_pose_right_topic)"/>
+        <param name="sync_slop" value="$(arg sync_slop)"/>
+        <param name="task_id" value="$(arg task_id)"/>
+        <param name="task_text" value="$(arg task_text)"/>
+        <param name="sync_fail_log_dir" value="$(arg sync_fail_log_dir)"/>
+    </node>
+
+    <node name="dagger_collector" pkg="dagger" type="dagger_collector_node.py" output="screen" if="$(arg collect_frame_data)">
+        <param name="config_file" value="$(arg config_file)"/>
+        <param name="ckpt_dir" value="$(arg ckpt_dir)"/>
+        <param name="task_id" value="$(arg task_id)"/>
+        <param name="scene_dir" value="$(arg scene_dir)"/>
+        <param name="save_data_base_dir" value="$(arg save_data_base_dir)"/>
+        <param name="data_collection_rate" value="$(arg data_collection_rate)"/>
+        <param name="synced_observation_queue_size" value="$(arg synced_observation_queue_size)"/>
+        <param name="synced_observation_drain_timeout" value="$(arg synced_observation_drain_timeout)"/>
+        <param name="debug" value="$(arg debug)"/>
+        <param name="camera_names" value="$(arg camera_names)"/>
+        <param name="img_head_topic" value="$(arg img_head_topic)"/>
+        <param name="img_front_topic" value="$(arg img_front_topic)"/>
+        <param name="img_left_topic" value="$(arg img_left_topic)"/>
+        <param name="img_right_topic" value="$(arg img_right_topic)"/>
+        <param name="puppet_arm_left_cmd_topic" value="$(arg puppet_arm_left_cmd_topic)"/>
+        <param name="puppet_arm_right_cmd_topic" value="$(arg puppet_arm_right_cmd_topic)"/>
+        <param name="puppet_arm_left_raw_action_topic" value="$(arg puppet_arm_left_raw_action_topic)"/>
+        <param name="puppet_arm_right_raw_action_topic" value="$(arg puppet_arm_right_raw_action_topic)"/>
+    </node>
+</launch>

@@ -1,0 +1,145 @@
+# Default runtime configuration for the FluxDAgger ROS stack.
+#
+# Node-private ROS params still override these values. Launch files should pass
+# "__config__" when they want a node to use this file's value.
+
+runtime:
+  debug: false
+  master_publish_rate: 200.0
+  puppet_publish_rate: 200.0
+  sync_observation_rate: 90.0
+  data_collection_rate: 30.0
+  sync_slop: 0.03
+  synced_observation_pub_queue_size: 120
+  synced_observation_queue_size: 120
+  synced_observation_drain_timeout: 30.0
+  task_text: "perform the manipulation task successfully"
+
+paths:
+  home_dir: "{home_dir}"
+  repo_dir: "{repo_dir}"
+  data_buffer_dir: "{home_dir}/dagger_data/data_buffer"
+  captures_dir: "{repo_dir}/tools/visualize/captures_multi4"
+  screenshots_dir: "{repo_dir}/tools/visualize/screenshots"
+  sync_fail_log_dir: "{home_dir}/sync_fail_logs"
+  act_checkpoint_dir: "{home_dir}/checkpoint/act"
+  qwen3_reward_model: "{repo_dir}/ckpt/reward_model/qwen3_reward/step35000"
+
+topics:
+  puppet_arm_left: "/puppet/joint_left"
+  puppet_arm_right: "/puppet/joint_right"
+  puppet_ee_pose_left: "/puppet/end_pose_left"
+  puppet_ee_pose_right: "/puppet/end_pose_right"
+  master_joint_left: "/master/joint_left"
+  master_joint_right: "/master/joint_right"
+  human_joint_left: "/master/joint/left_human"
+  human_joint_right: "/master/joint/right_human"
+  raw_action_left: "/left_arm/trajectory"
+  raw_action_right: "/right_arm/trajectory"
+  dagger_control_command: "/dagger/control/command"
+  dagger_global_state: "/dagger/global_state"
+  dagger_collector_command: "/dagger/collector/command"
+  dagger_episode_info: "/dagger/episode_info"
+  dagger_episode_result: "/dagger/collector/episode_result"
+  dagger_input_request: "/dagger/controller/input_request"
+  dagger_input_result: "/dagger/controller/input_result"
+  robot_observation_sync: "/robot/observation_sync"
+  robot_reward_signal: "/robot/reward_signal"
+  arm_mode_template: "/dagger/arm/{arm_name}/mode"
+  arm_subscribe_template: "/dagger/arm/{arm_name}/subscribe_target"
+  arm_enable_template: "/dagger/arm/{arm_name}/enable"
+  arm_status_template: "/dagger/arm/{arm_name}/status"
+
+cameras:
+  order: ["head", "left_wrist", "right_wrist", "front"]
+  default_saved: ["head", "left_wrist", "right_wrist"]
+  items:
+    head:
+      name: "cam_high"
+      topic: "/camera_h/color/image_raw"
+      ros_param: "img_head_topic"
+      short_key: "h"
+      msg_field: "cam_high"
+      label: "Head View"
+      sync_enabled: true
+    front:
+      name: "cam_front"
+      topic: "/camera_f/color/image_raw"
+      ros_param: "img_front_topic"
+      short_key: "f"
+      msg_field: "cam_front"
+      label: "Front View"
+      sync_enabled: false
+    left_wrist:
+      name: "cam_left_wrist"
+      topic: "/camera_l/color/image_raw"
+      ros_param: "img_left_topic"
+      short_key: "l"
+      msg_field: "cam_left_wrist"
+      label: "Left Wrist"
+      sync_enabled: true
+    right_wrist:
+      name: "cam_right_wrist"
+      topic: "/camera_r/color/image_raw"
+      ros_param: "img_right_topic"
+      short_key: "r"
+      msg_field: "cam_right_wrist"
+      label: "Right Wrist"
+      sync_enabled: true
+
+arms:
+  home_end_pose: [57.0, 0.0, 215.0, 0.0, 85.0, 0.0, 0.0]
+  home_joints:
+    left: [-0.19779752, 1.07020684, -0.61802348, -1.30887565, 1.1520192, 2.10289164, 0.092]
+    right: [0.34008822, 0.95214585, -0.56617991, 1.13862221, 0.82892144, -1.80234897, 0.06909]
+  profiles:
+    front_left:
+      role: "front"
+      can_port: "c_left_slave"
+      joint_pub_topic: null
+      joint_sub_topic: "/master/joint_left"
+      joint_state_pub_topic: "/puppet/joint_left"
+      end_pose_pub_topic: "/puppet/end_pose_left"
+      human_sub_topic: "/master/joint/left_human"
+      home_joint: "left"
+    front_right:
+      role: "front"
+      can_port: "c_right_slave"
+      joint_pub_topic: null
+      joint_sub_topic: "/master/joint_right"
+      joint_state_pub_topic: "/puppet/joint_right"
+      end_pose_pub_topic: "/puppet/end_pose_right"
+      human_sub_topic: "/master/joint/right_human"
+      home_joint: "right"
+    rear_left:
+      role: "rear"
+      can_port: "c_left_master"
+      joint_pub_topic: "/master/joint/left_human"
+      joint_sub_topic: "/master/joint_left"
+      joint_state_pub_topic: null
+      end_pose_pub_topic: null
+      human_sub_topic: null
+      home_joint: "left"
+    rear_right:
+      role: "rear"
+      can_port: "c_right_master"
+      joint_pub_topic: "/master/joint/right_human"
+      joint_sub_topic: "/master/joint_right"
+      joint_state_pub_topic: null
+      end_pose_pub_topic: null
+      human_sub_topic: null
+      home_joint: "right"
+
+collector:
+  ckpt_dir: "/tmp/test_sync"
+  task_id: "test_policy"
+  scene_dir: "fold_towels"
+
+reward:
+  qwen3:
+    model_path: "{repo_dir}/ckpt/reward_model/qwen3_reward/step35000"
+    prompt: "<video><video><video> Describe the task status: fold the square off-white towel"
+    f_interval: 8
+    t_interval: 16
+    max_new_tokens: 1024
+    source_tag: "qwen3_reward@online_node"
