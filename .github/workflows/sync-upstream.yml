@@ -1,0 +1,30 @@
+name: Sync upstream main
+
+on:
+  schedule:
+    # 04:17 Asia/Shanghai, daily (GitHub schedules use UTC).
+    - cron: '17 20 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream-main
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'Colorfu1/FluxDAgger'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Merge upstream main into this fork
+        # GitHub preserves fork commits and rejects conflicting updates.
+        # No force push, checkout, or personal access token is needed.
+        run: |
+          gh api --method POST repos/Colorfu1/FluxDAgger/merge-upstream \
+            --field branch=main \
+            --jq '.message'
